@@ -1,0 +1,32 @@
+package com.example.foodmap_project.constants;
+
+public enum FoodMapRtnCode {
+
+	SUCCESSFUL("200","SUCCESSFUL"),
+	SHOPNAME_CITY_REQUIRED("400","Shop_name & City can not be null or empty"),
+	SHOPNAME_REQUIRED("400","Shop_name can not be null or empty"),
+	MEALNAME_REQUIRED("400","Shop_name & Meal_name can not be null or empty"),
+	PRICE_NEGATIVE("400","price cannot be negative"),
+	SHOPNAME_EXISTED("403","Shop_name is existed"),
+	MEALNAME_EXISTED("403","Shop_name & Meal_name is existed"),
+	SHOPNAME_INEXISTED("403","Shop_name is not existed"),
+	MEALNAME_INEXISTED("403","Shop_name & Meal_name is not existed"),
+	LEVEL_FAILURE("400","Level is fail"),
+	ADD_ROLE_FAILURE("500","role is fail");
+	
+	private String code;
+	private String message;
+	
+	private FoodMapRtnCode(String code,String message) {
+		this.code = code;
+		this.message = message;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+}

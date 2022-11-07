@@ -6,6 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 //import org.springframework.data.annotation.Id;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Entity
 @Table(name = "foodmap_meal")
 @IdClass(FoodMap_Meal_Id.class)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class FoodMap_Meal {
 
 	@Id

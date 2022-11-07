@@ -5,6 +5,7 @@ import java.util.List;
 import com.example.foodmap_project.entity.FoodMap_Meal;
 import com.example.foodmap_project.entity.FoodMap_Meal_Id;
 import com.example.foodmap_project.entity.FoodMap_Shop;
+import com.example.foodmap_project.vo.FoodMapListResponse;
 import com.example.foodmap_project.vo.FoodMapResponse;
 
 public interface FoodMapService {
@@ -17,11 +18,12 @@ public interface FoodMapService {
 	public FoodMap_Meal updateMealInfo(FoodMap_Meal_Id mealId, int price, int mealLevel);
 	public FoodMap_Meal updateMealId(FoodMap_Meal_Id mealId, FoodMap_Meal_Id newMealId);
 
-	public FoodMapResponse findShopByCity(String City,int displayAmount);
-	public FoodMapResponse findShopByShopLevel(int shopLevel);
-	public FoodMapResponse findShopByShopLevelAndMealLevel(int shopLevel,int mealLevel);
+	public FoodMapListResponse findShopByCity(String City,int displayAmount);
+	public FoodMapListResponse findShopByShopLevel(int shopLevel);
+	public FoodMapListResponse findShopByShopLevelAndMealLevel(int shopLevel,int mealLevel);
 	
 	public FoodMap_Shop findShopById(String shopName);
 	public FoodMap_Meal findMealById(FoodMap_Meal_Id mealId);
+//	public List<FoodMap_Shop> findAll();
 
 }

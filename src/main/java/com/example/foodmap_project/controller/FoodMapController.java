@@ -11,6 +11,7 @@ import com.example.foodmap_project.entity.FoodMap_Meal;
 import com.example.foodmap_project.entity.FoodMap_Meal_Id;
 import com.example.foodmap_project.entity.FoodMap_Shop;
 import com.example.foodmap_project.service.ifs.FoodMapService;
+import com.example.foodmap_project.vo.FoodMapListResponse;
 import com.example.foodmap_project.vo.FoodMapRequest;
 import com.example.foodmap_project.vo.FoodMapResponse;
 
@@ -83,13 +84,12 @@ public class FoodMapController {
 		if (res1 != null) {
 			return res1;
 		}
-		
+
 		FoodMap_Meal_Id id = new FoodMap_Meal_Id(req.getShopName(), req.getMealName());
 		FoodMap_Meal meal = foodMapService.findMealById(id);
 
 		if (meal != null) {
 			if (req.getPrice() != 0 || req.getMealLevel() != 0) {
-				int a = req.getMealLevel();
 				meal = foodMapService.updateMealInfo(id, req.getPrice(), req.getMealLevel());
 			}
 			FoodMap_Meal meal1 = checkNewShopAndMealName(req, meal);
@@ -102,6 +102,49 @@ public class FoodMapController {
 		return new FoodMapResponse(FoodMapRtnCode.MEALNAME_INEXISTED.getMessage());
 	}
 
+	@PostMapping(value = "/api/findShopByCity")
+	public FoodMapListResponse findShopByCity(@RequestBody FoodMapRequest req) {
+
+		if (req.getDisplayAmount() < 0) {
+			return new FoodMapListResponse(FoodMapRtnCode.DISPLAYAMOUNT_NEGATIVE.getMessage());
+		}
+		if(!StringUtils.hasText(req.getCity())) {
+			return new FoodMapListResponse(FoodMapRtnCode.CITY_REQUIRED.getMessage());
+		}
+
+		FoodMapListResponse listRes = foodMapService.findShopByCity(req.getCity(), req.getDisplayAmount());
+		if (listRes.getResList().isEmpty()) {
+			return new FoodMapListResponse(FoodMapRtnCode.CITY_INEXISTED.getMessage());
+		}
+		return listRes;
+	}
+
+	@PostMapping(value = "/api/findShopByShopLevel")
+	public FoodMapListResponse findShopByShopLevel(@RequestBody FoodMapRequest req) {
+		
+		if(req.getShopLevel()<0 || req.getShopLevel()>5) {
+			return new FoodMapListResponse(FoodMapRtnCode.SHOPLEVEL_FAIL.getMessage());
+		}
+		
+		FoodMapListResponse listRes = foodMapService.findShopByShopLevel(req.getShopLevel());
+		
+		return listRes;
+		
+	}
+	
+	@PostMapping(value = "/api/findShopByShopLevelAndMealLevel")
+	public FoodMapListResponse findShopByShopLevelAndMealLevel(@RequestBody FoodMapRequest req) {
+		
+		if(req.getShopLevel()<0 || req.getShopLevel()>5) {
+			return new FoodMapListResponse(FoodMapRtnCode.SHOPLEVEL_FAIL.getMessage());
+		}
+		if(req.getMealLevel()<0 || req.getMealLevel()>5) {
+			return new FoodMapListResponse(FoodMapRtnCode.MEALLEVEL_FAIL.getMessage());
+		}
+		FoodMapListResponse listRes = foodMapService.findShopByShopLevelAndMealLevel(req.getShopLevel(), req.getMealLevel());
+		return listRes;
+		
+	}
 //================================================
 	private FoodMapResponse checkParamShop(FoodMapRequest req) {
 		if (!StringUtils.hasText(req.getShopName()) || !StringUtils.hasText(req.getCity())) {

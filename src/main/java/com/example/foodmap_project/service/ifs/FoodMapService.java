@@ -16,7 +16,7 @@ public interface FoodMapService {
 	public FoodMap_Shop updateShopName(String shopName, String newShopName);
 
 	public FoodMap_Meal updateMealInfo(FoodMap_Meal_Id mealId, int price, int mealLevel);
-	public FoodMap_Meal updateMealId(FoodMap_Meal_Id mealId, FoodMap_Meal_Id newMealId);
+	public FoodMap_Meal updateMealName(FoodMap_Meal_Id mealId, String newMealName);
 
 	public FoodMapListResponse findShopByCity(String City,int displayAmount);
 	public FoodMapListResponse findShopByShopLevel(int shopLevel);

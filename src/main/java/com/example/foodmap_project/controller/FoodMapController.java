@@ -23,6 +23,7 @@ public class FoodMapController {
 
 	@PostMapping(value = "/api/createShopInfo")
 	public FoodMapResponse createShopInfo(@RequestBody FoodMapRequest req) {
+
 		FoodMapResponse res = checkParamShop(req);
 		if (res != null) {
 			return res;
@@ -37,6 +38,13 @@ public class FoodMapController {
 
 	@PostMapping(value = "/api/createMealInfo")
 	public FoodMapResponse createMealInfo(@RequestBody FoodMapRequest req) {
+		if (req.getMealLevel() == 0 || req.getPrice() == 0) {
+			return new FoodMapResponse(FoodMapRtnCode.LEVEL_PRICE_FAILURE.getMessage());
+		}
+		if (foodMapService.findShopById(req.getShopName()) == null) {
+			return new FoodMapResponse(FoodMapRtnCode.SHOPNAME_INEXISTED.getMessage());
+		}
+
 		FoodMapResponse res1 = checkParamMeal(req);
 		if (res1 != null) {
 			return res1;
@@ -44,6 +52,7 @@ public class FoodMapController {
 
 		FoodMap_Meal_Id id = new FoodMap_Meal_Id(req.getShopName(), req.getMealName());
 		FoodMap_Meal meal = foodMapService.createMealInfo(id, req.getPrice(), req.getMealLevel());
+
 		if (meal == null) {
 			return new FoodMapResponse(FoodMapRtnCode.MEALNAME_EXISTED.getMessage());
 		}
@@ -74,11 +83,13 @@ public class FoodMapController {
 		return new FoodMapResponse(FoodMapRtnCode.SHOPNAME_INEXISTED.getMessage());
 	}
 
+//===updateMealAllInfo=============================================================================	
 	@PostMapping(value = "/api/updateMealAllInfo")
 	public FoodMapResponse updateMealAllInfo(@RequestBody FoodMapRequest req) {
-//		if (!StringUtils.hasText(req.getShopName()) || !StringUtils.hasText(req.getMealName())) {
-//			return new FoodMapResponse(FoodMapRtnCode.MEALNAME_REQUIRED.getMessage());
-//		}
+
+		if (!StringUtils.hasText(req.getNewMealName()) && req.getPrice() == 0 && req.getMealLevel() == 0) {
+			return new FoodMapResponse("Price=0,MealLevel=0,NewMealName為空，資訊皆不修改");
+		}
 
 		FoodMapResponse res1 = checkParamMeal(req);
 		if (res1 != null) {
@@ -86,15 +97,15 @@ public class FoodMapController {
 		}
 
 		FoodMap_Meal_Id id = new FoodMap_Meal_Id(req.getShopName(), req.getMealName());
-		FoodMap_Meal meal = foodMapService.findMealById(id);
+		FoodMap_Meal meal = foodMapService.findMealById(id); // 找輸入的商店名稱跟餐點名稱
 
-		if (meal != null) {
+		if (meal != null) {// meal有東西
 			if (req.getPrice() != 0 || req.getMealLevel() != 0) {
 				meal = foodMapService.updateMealInfo(id, req.getPrice(), req.getMealLevel());
 			}
-			FoodMap_Meal meal1 = checkNewShopAndMealName(req, meal);
-			if (meal1 != null) {
-				return new FoodMapResponse(meal1, FoodMapRtnCode.SUCCESSFUL.getMessage());
+//			FoodMap_Meal meal1 = checkNewShopAndMealName(req, meal);
+			if (StringUtils.hasText(req.getNewMealName())) {
+				meal = foodMapService.updateMealName(id, req.getNewMealName());
 			}
 			return new FoodMapResponse(meal, FoodMapRtnCode.SUCCESSFUL.getMessage());
 		}
@@ -108,7 +119,7 @@ public class FoodMapController {
 		if (req.getDisplayAmount() < 0) {
 			return new FoodMapListResponse(FoodMapRtnCode.DISPLAYAMOUNT_NEGATIVE.getMessage());
 		}
-		if(!StringUtils.hasText(req.getCity())) {
+		if (!StringUtils.hasText(req.getCity())) {
 			return new FoodMapListResponse(FoodMapRtnCode.CITY_REQUIRED.getMessage());
 		}
 
@@ -121,30 +132,32 @@ public class FoodMapController {
 
 	@PostMapping(value = "/api/findShopByShopLevel")
 	public FoodMapListResponse findShopByShopLevel(@RequestBody FoodMapRequest req) {
-		
-		if(req.getShopLevel()<0 || req.getShopLevel()>5) {
+
+		if (req.getShopLevel() < 0 || req.getShopLevel() > 5) {
 			return new FoodMapListResponse(FoodMapRtnCode.SHOPLEVEL_FAIL.getMessage());
 		}
-		
+
 		FoodMapListResponse listRes = foodMapService.findShopByShopLevel(req.getShopLevel());
-		
+
 		return listRes;
-		
+
 	}
-	
+
 	@PostMapping(value = "/api/findShopByShopLevelAndMealLevel")
 	public FoodMapListResponse findShopByShopLevelAndMealLevel(@RequestBody FoodMapRequest req) {
-		
-		if(req.getShopLevel()<0 || req.getShopLevel()>5) {
+
+		if (req.getShopLevel() < 0 || req.getShopLevel() > 5) {
 			return new FoodMapListResponse(FoodMapRtnCode.SHOPLEVEL_FAIL.getMessage());
 		}
-		if(req.getMealLevel()<0 || req.getMealLevel()>5) {
+		if (req.getMealLevel() < 0 || req.getMealLevel() > 5) {
 			return new FoodMapListResponse(FoodMapRtnCode.MEALLEVEL_FAIL.getMessage());
 		}
-		FoodMapListResponse listRes = foodMapService.findShopByShopLevelAndMealLevel(req.getShopLevel(), req.getMealLevel());
+		FoodMapListResponse listRes = foodMapService.findShopByShopLevelAndMealLevel(req.getShopLevel(),
+				req.getMealLevel());
 		return listRes;
-		
+
 	}
+
 //================================================
 	private FoodMapResponse checkParamShop(FoodMapRequest req) {
 		if (!StringUtils.hasText(req.getShopName()) || !StringUtils.hasText(req.getCity())) {
@@ -156,9 +169,12 @@ public class FoodMapController {
 	private FoodMapResponse checkParamMeal(FoodMapRequest req) {
 		if (!StringUtils.hasText(req.getShopName()) || !StringUtils.hasText(req.getMealName())) {
 			return new FoodMapResponse(FoodMapRtnCode.MEALNAME_REQUIRED.getMessage());
+
+//			if(StringUtils.hasText(req.getShopName())&&StringUtils.hasText(req.getMealName())&&)
+
 		} else if (req.getPrice() < 0) {
-			return new FoodMapResponse(FoodMapRtnCode.PRICE_NEGATIVE.getMessage());
-		} else if (req.getMealLevel() < 1 || req.getMealLevel() > 5) {
+			return new FoodMapResponse(FoodMapRtnCode.PRICE_FAIL.getMessage());
+		} else if (req.getMealLevel() < 0 || req.getMealLevel() > 5) {
 			return new FoodMapResponse(FoodMapRtnCode.LEVEL_FAILURE.getMessage());
 		}
 		return null;
@@ -166,24 +182,24 @@ public class FoodMapController {
 
 	private FoodMap_Meal checkNewShopAndMealName(FoodMapRequest req, FoodMap_Meal meal) {
 
-		FoodMap_Meal_Id id = new FoodMap_Meal_Id(req.getShopName(), req.getMealName());
-//		FoodMap_Meal meal = foodMapService.findMealById(id);
-
-		if (StringUtils.hasText(req.getNewShopName()) && StringUtils.hasText(req.getNewMealName())) {
-			FoodMap_Meal_Id newId = new FoodMap_Meal_Id(req.getNewShopName(), req.getNewMealName());
-			meal = foodMapService.updateMealId(id, newId);
-			return meal;
-		}
-		if (StringUtils.hasText(req.getNewShopName()) && !StringUtils.hasText(req.getNewMealName())) {
-			FoodMap_Meal_Id newId = new FoodMap_Meal_Id(req.getNewShopName(), meal.getMealName());
-			meal = foodMapService.updateMealId(id, newId);
-			return meal;
-		}
-		if (!StringUtils.hasText(req.getNewShopName()) && StringUtils.hasText(req.getNewMealName())) {
-			FoodMap_Meal_Id newId = new FoodMap_Meal_Id(meal.getShopName(), req.getNewMealName());
-			meal = foodMapService.updateMealId(id, newId);
-			return meal;
-		}
+//		FoodMap_Meal_Id id = new FoodMap_Meal_Id(req.getShopName(), req.getMealName());
+////		FoodMap_Meal meal = foodMapService.findMealById(id);
+//
+//		if (StringUtils.hasText(req.getNewShopName()) && StringUtils.hasText(req.getNewMealName())) {
+//			FoodMap_Meal_Id newId = new FoodMap_Meal_Id(req.getNewShopName(), req.getNewMealName());
+//			meal = foodMapService.updateMealName(id, newId);
+//			return meal;
+//		}
+//		if (StringUtils.hasText(req.getNewShopName()) && !StringUtils.hasText(req.getNewMealName())) {
+//			FoodMap_Meal_Id newId = new FoodMap_Meal_Id(req.getNewShopName(), meal.getMealName());
+//			meal = foodMapService.updateMealName(id, newId);
+//			return meal;
+//		}
+//		if (!StringUtils.hasText(req.getNewShopName()) && StringUtils.hasText(req.getNewMealName())) {
+//			FoodMap_Meal_Id newId = new FoodMap_Meal_Id(meal.getShopName(), req.getNewMealName());
+//			meal = foodMapService.updateMealName(id, newId);
+//			return meal;
+//		}
 		return null;
 	}
 }

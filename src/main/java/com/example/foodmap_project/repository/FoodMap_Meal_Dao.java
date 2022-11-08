@@ -13,7 +13,7 @@ import com.example.foodmap_project.entity.FoodMap_Shop;
 public interface FoodMap_Meal_Dao extends JpaRepository<FoodMap_Meal, FoodMap_Meal_Id>{
 
 	public List<FoodMap_Meal> findByShopNameOrderByMealLevelDesc(String shopName);
-//	public List<FoodMap_Meal> findBymealLevelGreaterThan(int mealLevel);
+	public List<FoodMap_Meal> findByMealLevelGreaterThan(int mealLevel);
 	public List<FoodMap_Meal> findByShopNameAllIgnoreCaseOrderByMealLevelDesc(String shopName);
 	public List<FoodMap_Meal> findAllByOrderByMealLevelDesc();
 }

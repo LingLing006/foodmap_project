@@ -13,9 +13,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "foodmap_meal")
-@IdClass(FoodMap_Meal_Id.class)
+@IdClass(FoodMapMealId.class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class FoodMap_Meal {
+public class FoodMapMeal {
 
 	@Id
 	@Column(name = "shop_name")
@@ -32,11 +32,11 @@ public class FoodMap_Meal {
 	@Column(name = "meal_level")
 	private int mealLevel;
 
-	public FoodMap_Meal() {
+	public FoodMapMeal() {
 		
 	}
 	
-	public FoodMap_Meal(String shop_name,String meal_name,int price,int mealLevel) {
+	public FoodMapMeal(String shop_name,String meal_name,int price,int mealLevel) {
 		this.shopName = shop_name;
 		this.mealName = meal_name;
 		this.mealLevel = mealLevel;

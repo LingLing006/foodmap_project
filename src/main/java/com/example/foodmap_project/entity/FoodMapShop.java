@@ -7,7 +7,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="foodmap_shop")
-public class FoodMap_Shop {
+public class FoodMapShop {
 
 	@Id
 //	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,11 +22,11 @@ public class FoodMap_Shop {
 	private double shopLevel;
 
 //=========================================	
-	public FoodMap_Shop() {
+	public FoodMapShop() {
 		
 	}
 	
-	public FoodMap_Shop(String shopName,String city) {
+	public FoodMapShop(String shopName,String city) {
 		this.shopName = shopName;
 		this.city = city;
 	}

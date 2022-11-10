@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
 
-import com.example.foodmap_project.entity.FoodMap_Meal;
-import com.example.foodmap_project.entity.FoodMap_Meal_Id;
-import com.example.foodmap_project.entity.FoodMap_Shop;
-import com.example.foodmap_project.repository.FoodMap_Meal_Dao;
-import com.example.foodmap_project.repository.FoodMap_Shop_Dao;
+import com.example.foodmap_project.entity.FoodMapMeal;
+import com.example.foodmap_project.entity.FoodMapMealId;
+import com.example.foodmap_project.entity.FoodMapShop;
+import com.example.foodmap_project.repository.FoodMapMealDao;
+import com.example.foodmap_project.repository.FoodMapShopDao;
 import com.example.foodmap_project.service.ifs.FoodMapService;
 import com.example.foodmap_project.vo.FoodMapListResponse;
 
@@ -19,10 +19,10 @@ import com.example.foodmap_project.vo.FoodMapListResponse;
 class FoodmapProjectApplicationTests {
 
 	@Autowired
-	private FoodMap_Meal_Dao foodMapMealDao;
+	private FoodMapMealDao foodMapMealDao;
 	
 	@Autowired
-	private FoodMap_Shop_Dao foodMapShopDao;
+	private FoodMapShopDao foodMapShopDao;
 	
 	@Autowired
 	private FoodMapService foodMapService;
@@ -30,8 +30,10 @@ class FoodmapProjectApplicationTests {
 	@Test
 	public void contextLoads() {
 		
-		FoodMap_Shop shop = foodMapService.updateShopName("AAA", "KFC");
-		System.out.println(shop.getShopName()+"  "+shop.getShopLevel());
+		
+		
+//		FoodMapShop shop = foodMapService.updateShopName("AAA", "KFC");
+//		System.out.println(shop.getShopName()+"  "+shop.getShopLevel());
 		
 //		List<FoodMap_Shop> shopList = foodMapShopDao.findTop3ByCityOrderByShopLevelDesc("Keelung");
 //		for(FoodMap_Shop shop :shopList ) {
@@ -52,10 +54,17 @@ class FoodmapProjectApplicationTests {
 	}
 	@Test
 	public void test() {
-		FoodMap_Meal_Id id = new FoodMap_Meal_Id("Starbucks","coffee");
-		FoodMap_Meal meal = foodMapService.updateMealName(id, "pancake");
-		System.out.println(meal.getShopName()+ "    "+ meal.getMealName()+"    "+meal.getMealLevel()+"    "+meal.getPrice());
 		
+		List<FoodMapShop> shopList = foodMapShopDao.findByShopLevelGreaterThanOrderByShopLevelDesc(3);
+		for(FoodMapShop shop :shopList) {
+			System.out.printf("shopname:%s city:%s shopLevel:%.2f\n",shop.getShopName(),shop.getCity(),shop.getShopLevel());
+
+		}
+		
+//		FoodMapMealId id = new FoodMapMealId("Starbucks","coffee");
+//		FoodMapMeal meal = foodMapService.updateMealName(id, "pancake");
+//		System.out.println(meal.getShopName()+ "    "+ meal.getMealName()+"    "+meal.getMealLevel()+"    "+meal.getPrice());
+//		
 //		FoodMapListResponse listRes = foodMapService.findShopByCity("Keelung", 3);
 //		System.out.println("City"+listRes.getCity());
 //		System.out.println(listRes.getResList());

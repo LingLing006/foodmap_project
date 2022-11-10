@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.foodmap_project.constants.FoodMapRtnCode;
-import com.example.foodmap_project.entity.FoodMap_Meal;
-import com.example.foodmap_project.entity.FoodMap_Meal_Id;
-import com.example.foodmap_project.entity.FoodMap_Shop;
+import com.example.foodmap_project.entity.FoodMapMeal;
+import com.example.foodmap_project.entity.FoodMapMealId;
+import com.example.foodmap_project.entity.FoodMapShop;
 import com.example.foodmap_project.service.ifs.FoodMapService;
 import com.example.foodmap_project.vo.FoodMapListResponse;
 import com.example.foodmap_project.vo.FoodMapRequest;
@@ -23,17 +23,14 @@ public class FoodMapController {
 
 	@PostMapping(value = "/api/createShopInfo")
 	public FoodMapResponse createShopInfo(@RequestBody FoodMapRequest req) {
-
-		FoodMapResponse res = checkParamShop(req);
+		
+		FoodMapResponse res = checkParamShop(req);//擋掉不符合的資料
 		if (res != null) {
 			return res;
 		}
-
-		FoodMap_Shop shop = foodMapService.createShopInfo(req.getShopName(), req.getCity());
-		if (shop == null) {
-			return new FoodMapResponse(shop, FoodMapRtnCode.SHOPNAME_EXISTED.getMessage());
-		}
-		return new FoodMapResponse(shop, FoodMapRtnCode.SUCCESSFUL.getMessage());
+		
+		res = foodMapService.createShopInfo(req.getShopName(), req.getCity());
+		return res;
 	}
 
 	@PostMapping(value = "/api/createMealInfo")
@@ -41,25 +38,12 @@ public class FoodMapController {
 		if (req.getMealLevel() == 0 || req.getPrice() == 0) {
 			return new FoodMapResponse(FoodMapRtnCode.LEVEL_PRICE_FAILURE.getMessage());
 		}
-		if (foodMapService.findShopById(req.getShopName()) == null) {
-			return new FoodMapResponse(FoodMapRtnCode.SHOPNAME_INEXISTED.getMessage());
+		FoodMapResponse res = checkParamMeal(req);
+		if (res != null) {
+			return res;
 		}
-
-		FoodMapResponse res1 = checkParamMeal(req);
-		if (res1 != null) {
-			return res1;
-		}
-
-		FoodMap_Meal_Id id = new FoodMap_Meal_Id(req.getShopName(), req.getMealName());
-		FoodMap_Meal meal = foodMapService.createMealInfo(id, req.getPrice(), req.getMealLevel());
-
-		if (meal == null) {
-			return new FoodMapResponse(FoodMapRtnCode.MEALNAME_EXISTED.getMessage());
-		}
-
-		FoodMapResponse res = new FoodMapResponse();
-		res.setMeal(meal);
-		res.setMessage(FoodMapRtnCode.SUCCESSFUL.getMessage());
+		FoodMapMealId id = new FoodMapMealId(req.getShopName(), req.getMealName());
+		res  = foodMapService.createMealInfo(id, req.getPrice(), req.getMealLevel());
 		return res;
 
 	}
@@ -69,18 +53,12 @@ public class FoodMapController {
 		if (!StringUtils.hasText(req.getShopName())) {
 			return new FoodMapResponse(FoodMapRtnCode.SHOPNAME_REQUIRED.getMessage());
 		}
-
-		FoodMap_Shop shop = foodMapService.findShopById(req.getShopName());
-		if (shop != null) {
-			if (StringUtils.hasText(req.getCity())) {
-				shop = foodMapService.updateShopInfo(req.getShopName(), req.getCity());// 先判斷有沒有city，有的話先改
-			}
-			if (StringUtils.hasText(req.getNewShopName())) {
-				shop = foodMapService.updateShopName(req.getShopName(), req.getNewShopName());// 改完city之後再改new_shop_name
-			}
-			return new FoodMapResponse(shop, FoodMapRtnCode.SUCCESSFUL.getMessage());
+		if(!StringUtils.hasText(req.getNewShopName()) && !StringUtils.hasText(req.getCity())) {
+			return new FoodMapResponse(FoodMapRtnCode.NEWSHOPNAME_CITY_REQUIRED.getMessage());
 		}
-		return new FoodMapResponse(FoodMapRtnCode.SHOPNAME_INEXISTED.getMessage());
+		
+		FoodMapResponse res = foodMapService.updateShopInfo(req.getShopName(), req.getCity(), req.getNewShopName());
+		return res;
 	}
 
 //===updateMealAllInfo=============================================================================	
@@ -91,26 +69,14 @@ public class FoodMapController {
 			return new FoodMapResponse("Price=0,MealLevel=0,NewMealName為空，資訊皆不修改");
 		}
 
-		FoodMapResponse res1 = checkParamMeal(req);
-		if (res1 != null) {
-			return res1;
+		FoodMapResponse res = checkParamMeal(req);
+		if (res != null) {
+			return res;
 		}
-
-		FoodMap_Meal_Id id = new FoodMap_Meal_Id(req.getShopName(), req.getMealName());
-		FoodMap_Meal meal = foodMapService.findMealById(id); // 找輸入的商店名稱跟餐點名稱
-
-		if (meal != null) {// meal有東西
-			if (req.getPrice() != 0 || req.getMealLevel() != 0) {
-				meal = foodMapService.updateMealInfo(id, req.getPrice(), req.getMealLevel());
-			}
-//			FoodMap_Meal meal1 = checkNewShopAndMealName(req, meal);
-			if (StringUtils.hasText(req.getNewMealName())) {
-				meal = foodMapService.updateMealName(id, req.getNewMealName());
-			}
-			return new FoodMapResponse(meal, FoodMapRtnCode.SUCCESSFUL.getMessage());
-		}
-
-		return new FoodMapResponse(FoodMapRtnCode.MEALNAME_INEXISTED.getMessage());
+		
+		FoodMapMealId id = new FoodMapMealId(req.getShopName(), req.getMealName());
+		res = foodMapService.updateMealInfo(id, req.getPrice(), req.getMealLevel(),req.getNewMealName());
+		return res;
 	}
 
 	@PostMapping(value = "/api/findShopByCity")
@@ -124,9 +90,6 @@ public class FoodMapController {
 		}
 
 		FoodMapListResponse listRes = foodMapService.findShopByCity(req.getCity(), req.getDisplayAmount());
-		if (listRes.getResList().isEmpty()) {
-			return new FoodMapListResponse(FoodMapRtnCode.CITY_INEXISTED.getMessage());
-		}
 		return listRes;
 	}
 
@@ -169,9 +132,6 @@ public class FoodMapController {
 	private FoodMapResponse checkParamMeal(FoodMapRequest req) {
 		if (!StringUtils.hasText(req.getShopName()) || !StringUtils.hasText(req.getMealName())) {
 			return new FoodMapResponse(FoodMapRtnCode.MEALNAME_REQUIRED.getMessage());
-
-//			if(StringUtils.hasText(req.getShopName())&&StringUtils.hasText(req.getMealName())&&)
-
 		} else if (req.getPrice() < 0) {
 			return new FoodMapResponse(FoodMapRtnCode.PRICE_FAIL.getMessage());
 		} else if (req.getMealLevel() < 0 || req.getMealLevel() > 5) {
@@ -180,7 +140,7 @@ public class FoodMapController {
 		return null;
 	}
 
-	private FoodMap_Meal checkNewShopAndMealName(FoodMapRequest req, FoodMap_Meal meal) {
+	private FoodMapMeal checkNewShopAndMealName(FoodMapRequest req, FoodMapMeal meal) {
 
 //		FoodMap_Meal_Id id = new FoodMap_Meal_Id(req.getShopName(), req.getMealName());
 ////		FoodMap_Meal meal = foodMapService.findMealById(id);

@@ -2,8 +2,8 @@ package com.example.foodmap_project.vo;
 
 import java.util.List;
 
-import com.example.foodmap_project.entity.FoodMap_Meal;
-import com.example.foodmap_project.entity.FoodMap_Shop;
+import com.example.foodmap_project.entity.FoodMapMeal;
+import com.example.foodmap_project.entity.FoodMapShop;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -17,16 +17,16 @@ public class FoodMapResponse {
 	@JsonProperty("shop_level")
 	private double shopLevel;
 	
-	private FoodMap_Shop shop;
+	private FoodMapShop shop;
 	
-	private FoodMap_Meal meal;
+	private FoodMapMeal meal;
 	
 	@JsonProperty("city")
 	private String city;
 	
 	private String message;
 	
-	private List<FoodMap_Meal> MealList;
+	private List<FoodMapMeal> MealList;
 
 //===========================================	
 	public FoodMapResponse() {
@@ -36,11 +36,11 @@ public class FoodMapResponse {
 		this.message = message;
 	}
 	
-	public FoodMapResponse(FoodMap_Shop shop,String message) {
+	public FoodMapResponse(FoodMapShop shop,String message) {
 		this.shop = shop;
 		this.message = message;
 	}
-	public FoodMapResponse(FoodMap_Meal meal,String message) {
+	public FoodMapResponse(FoodMapMeal meal,String message) {
 		this.meal = meal;
 		this.message = message;
 	}
@@ -61,11 +61,11 @@ public class FoodMapResponse {
 		this.shopLevel = shopLevel;
 	}
 
-	public List<FoodMap_Meal> getMealList() {
+	public List<FoodMapMeal> getMealList() {
 		return MealList;
 	}
 
-	public void setMealList(List<FoodMap_Meal> mealList) {
+	public void setMealList(List<FoodMapMeal> mealList) {
 		MealList = mealList;
 	}
 
@@ -77,11 +77,11 @@ public class FoodMapResponse {
 		this.city = city;
 	}
 
-	public FoodMap_Shop getShop() {
+	public FoodMapShop getShop() {
 		return shop;
 	}
 
-	public void setShop(FoodMap_Shop shop) {
+	public void setShop(FoodMapShop shop) {
 		this.shop = shop;
 	}
 
@@ -92,10 +92,10 @@ public class FoodMapResponse {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	public FoodMap_Meal getMeal() {
+	public FoodMapMeal getMeal() {
 		return meal;
 	}
-	public void setMeal(FoodMap_Meal meal) {
+	public void setMeal(FoodMapMeal meal) {
 		this.meal = meal;
 	}
 

@@ -15,6 +15,6 @@ public interface FoodMapShopDao extends JpaRepository<FoodMapShop, String> {
 	public List<FoodMapShop> findByShopNameAllIgnoreCase(String shopName);
 	public List<FoodMapShop> findAllByOrderByShopLevelDesc();
 	
-	public List<FoodMapShop> findByShopLevelGreaterThanOrderByShopLevelDesc(int shopLevel);
+	public List<FoodMapShop> findByShopLevelGreaterThanOrderByShopLevelDesc(double shopLevel);
 //	public List<FoodMap_Shop> findAllOrderByShopLevelDesc();
 }

@@ -55,7 +55,7 @@ class FoodmapProjectApplicationTests {
 	@Test
 	public void test() {
 		
-		List<FoodMapShop> shopList = foodMapShopDao.findByShopLevelGreaterThanOrderByShopLevelDesc(3);
+		List<FoodMapShop> shopList = foodMapShopDao.findByShopLevelGreaterThanOrderByShopLevelDesc(3.0);
 		for(FoodMapShop shop :shopList) {
 			System.out.printf("shopname:%s city:%s shopLevel:%.2f\n",shop.getShopName(),shop.getCity(),shop.getShopLevel());
 

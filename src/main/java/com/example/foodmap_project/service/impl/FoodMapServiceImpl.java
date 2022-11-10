@@ -72,12 +72,11 @@ public class FoodMapServiceImpl implements FoodMapService {
 
 	@Override
 	public FoodMapResponse updateShopInfo(String shopName, String city, String newShopName) {
-		FoodMapShop shop = shopDao.getById(shopName);
+		FoodMapShop shop = shopDao.findById(shopName).get();
 		if (shop == null) {
 			return new FoodMapResponse(FoodMapRtnCode.SHOPNAME_INEXISTED.getMessage());
 		} // 此商店不存在
 
-		
 		shopDao.delete(shop);
 		if (StringUtils.hasText(city)) {
 			shop.setCity(city);
@@ -99,7 +98,7 @@ public class FoodMapServiceImpl implements FoodMapService {
 	@Override
 	public FoodMapResponse updateMealInfo(FoodMapMealId mealId, int price, int mealLevel , String newMealName) {
 
-		FoodMapMeal meal = mealDao.getById(mealId);
+		FoodMapMeal meal = mealDao.findById(mealId).get();
 		if (meal == null) {
 			return new FoodMapResponse(FoodMapRtnCode.MEALNAME_INEXISTED.getMessage());
 		} // 此商店名稱&餐點名稱不存在
@@ -174,11 +173,11 @@ public class FoodMapServiceImpl implements FoodMapService {
 	public FoodMapListResponse findShopByShopLevel(int shopLevel) {
 
 		FoodMapListResponse listRes = new FoodMapListResponse();
-		List<FoodMapShop> shopList = shopDao.findAllByOrderByShopLevelDesc();// 所有商店資料用ShopLevel排序
+		List<FoodMapShop> shopList = shopDao.findByShopLevelGreaterThanOrderByShopLevelDesc((double)shopLevel);// 所有商店資料用ShopLevel排序
 		List<FoodMapResponse> resList = new ArrayList<>();
 
 		for (FoodMapShop shop : shopList) {
-			if (shop.getShopLevel() >= shopLevel) {
+			
 				FoodMapResponse res = new FoodMapResponse();
 				List<FoodMapMeal> mealList = mealDao
 						.findByShopNameAllIgnoreCaseOrderByMealLevelDesc(shop.getShopName());// 評價符合條件的商店的餐點
@@ -190,7 +189,7 @@ public class FoodMapServiceImpl implements FoodMapService {
 				}
 				res.setMealList(mealList);
 				resList.add(res);
-			}
+			
 		}
 		listRes.setResList(resList);
 		return listRes;
@@ -200,12 +199,12 @@ public class FoodMapServiceImpl implements FoodMapService {
 	public FoodMapListResponse findShopByShopLevelAndMealLevel(int shopLevel, int mealLevel) {
 
 		FoodMapListResponse listRes = new FoodMapListResponse();
-		List<FoodMapShop> shopList = shopDao.findAllByOrderByShopLevelDesc();// 所有商店資料
+		List<FoodMapShop> shopList =  shopDao.findByShopLevelGreaterThanOrderByShopLevelDesc((double)shopLevel);// 所有商店資料
 //		List<FoodMapShop> shopList = shopDao.findByShopLevelGreaterThanOrderByShopLevelDesc(int shopLevel);// 所有商店資料
 		List<FoodMapResponse> resList = new ArrayList<>();
 
 		for (FoodMapShop shop : shopList) {
-			if (shop.getShopLevel() >= shopLevel) {
+			
 				FoodMapResponse res = new FoodMapResponse();
 				List<FoodMapMeal> mealList = mealDao
 						.findByShopNameAllIgnoreCaseOrderByMealLevelDesc(shop.getShopName());// 評價符合條件的商店的餐點
@@ -221,7 +220,7 @@ public class FoodMapServiceImpl implements FoodMapService {
 				res.setShopLevel(shop.getShopLevel());
 				res.setMealList(newMealList);
 				resList.add(res);
-			}
+			
 		}
 
 		listRes.setResList(resList);

@@ -72,11 +72,11 @@ public class FoodMapServiceImpl implements FoodMapService {
 
 	@Override
 	public FoodMapResponse updateShopInfo(String shopName, String city, String newShopName) {
-		FoodMapShop shop = shopDao.findById(shopName).get();
-		if (shop == null) {
+		Optional<FoodMapShop> shopOp = shopDao.findById(shopName);
+		if (shopOp.orElse(null) == null) {
 			return new FoodMapResponse(FoodMapRtnCode.SHOPNAME_INEXISTED.getMessage());
 		} // 此商店不存在
-
+		FoodMapShop shop = shopOp.get();
 		shopDao.delete(shop);
 		if (StringUtils.hasText(city)) {
 			shop.setCity(city);
@@ -96,14 +96,15 @@ public class FoodMapServiceImpl implements FoodMapService {
 	}
 
 	@Override
-	public FoodMapResponse updateMealInfo(FoodMapMealId mealId, int price, int mealLevel , String newMealName) {
+	public FoodMapResponse updateMealInfo(FoodMapMealId mealId, int price, int mealLevel, String newMealName) {
 
-		FoodMapMeal meal = mealDao.findById(mealId).get();
-		if (meal == null) {
+		Optional<FoodMapMeal> mealOp = mealDao.findById(mealId);
+		if (mealOp.orElse(null) == null) {
 			return new FoodMapResponse(FoodMapRtnCode.MEALNAME_INEXISTED.getMessage());
 		} // 此商店名稱&餐點名稱不存在
+		FoodMapMeal meal = mealOp.get();
 		mealDao.delete(meal);
-		
+
 		if (price != 0) {
 			meal.setPrice(price);
 		}
@@ -114,27 +115,17 @@ public class FoodMapServiceImpl implements FoodMapService {
 			for (FoodMapMeal mealitem : mealList) {
 				total += mealitem.getMealLevel();
 			}
-			FoodMapShop shop = shopDao.getById(mealId.getShopName());			
-			shop.setShopLevel(Math.round(((double) total / mealList.size()) * 10.0) / 10.0);
+			FoodMapShop shop = shopDao.getById(mealId.getShopName());
+			shop.setShopLevel(Math.round(((double) (total+mealLevel) / (mealList.size()+1)) * 10.0) / 10.0);
 			shopDao.save(shop);
 		}
-		if(StringUtils.hasText(newMealName)) {
+		if (StringUtils.hasText(newMealName)) {
 			meal.setMealName(newMealName);
 		}
 		mealDao.save(meal);
-		return new FoodMapResponse(meal, FoodMapRtnCode.SUCCESSFUL.getMessage());
+		return new FoodMapResponse(meal, FoodMapRtnCode.UPDATE_SUCCESSFUL.getMessage());
 	}
 
-	@Override
-	public FoodMapMeal updateMealName(FoodMapMealId mealId, String newMealName) {
-
-		Optional<FoodMapMeal> meal = mealDao.findById(mealId);
-
-		mealDao.deleteById(mealId);
-		meal.get().setMealName(newMealName);
-		return mealDao.save(meal.get());
-
-	}
 
 	@Override
 	public FoodMapListResponse findShopByCity(String City, int displayAmount) {
@@ -173,23 +164,22 @@ public class FoodMapServiceImpl implements FoodMapService {
 	public FoodMapListResponse findShopByShopLevel(int shopLevel) {
 
 		FoodMapListResponse listRes = new FoodMapListResponse();
-		List<FoodMapShop> shopList = shopDao.findByShopLevelGreaterThanOrderByShopLevelDesc((double)shopLevel);// 所有商店資料用ShopLevel排序
+		List<FoodMapShop> shopList = shopDao.findByShopLevelGreaterThanOrderByShopLevelDesc((double) shopLevel);// 所有商店資料用ShopLevel排序
 		List<FoodMapResponse> resList = new ArrayList<>();
 
 		for (FoodMapShop shop : shopList) {
-			
-				FoodMapResponse res = new FoodMapResponse();
-				List<FoodMapMeal> mealList = mealDao
-						.findByShopNameAllIgnoreCaseOrderByMealLevelDesc(shop.getShopName());// 評價符合條件的商店的餐點
-				res.setCity(shop.getCity());
-				res.setShopName(shop.getShopName());
-				res.setShopLevel(shop.getShopLevel());
-				for (FoodMapMeal meal : mealList) {
-					meal.setShopName(null);
-				}
-				res.setMealList(mealList);
-				resList.add(res);
-			
+
+			FoodMapResponse res = new FoodMapResponse();
+			List<FoodMapMeal> mealList = mealDao.findByShopNameAllIgnoreCaseOrderByMealLevelDesc(shop.getShopName());// 評價符合條件的商店的餐點
+			res.setCity(shop.getCity());
+			res.setShopName(shop.getShopName());
+			res.setShopLevel(shop.getShopLevel());
+			for (FoodMapMeal meal : mealList) {
+				meal.setShopName(null);
+			}
+			res.setMealList(mealList);
+			resList.add(res);
+
 		}
 		listRes.setResList(resList);
 		return listRes;
@@ -199,28 +189,27 @@ public class FoodMapServiceImpl implements FoodMapService {
 	public FoodMapListResponse findShopByShopLevelAndMealLevel(int shopLevel, int mealLevel) {
 
 		FoodMapListResponse listRes = new FoodMapListResponse();
-		List<FoodMapShop> shopList =  shopDao.findByShopLevelGreaterThanOrderByShopLevelDesc((double)shopLevel);// 所有商店資料
+		List<FoodMapShop> shopList = shopDao.findByShopLevelGreaterThanOrderByShopLevelDesc((double) shopLevel);// 所有商店資料
 //		List<FoodMapShop> shopList = shopDao.findByShopLevelGreaterThanOrderByShopLevelDesc(int shopLevel);// 所有商店資料
 		List<FoodMapResponse> resList = new ArrayList<>();
 
 		for (FoodMapShop shop : shopList) {
-			
-				FoodMapResponse res = new FoodMapResponse();
-				List<FoodMapMeal> mealList = mealDao
-						.findByShopNameAllIgnoreCaseOrderByMealLevelDesc(shop.getShopName());// 評價符合條件的商店的餐點
-				List<FoodMapMeal> newMealList = new ArrayList<FoodMapMeal>();
-				for (FoodMapMeal meal : mealList) {
-					if (meal.getMealLevel() >= mealLevel) {
-						meal.setShopName(null);
-						newMealList.add(meal);
-					}
+
+			FoodMapResponse res = new FoodMapResponse();
+			List<FoodMapMeal> mealList = mealDao.findByShopNameAllIgnoreCaseOrderByMealLevelDesc(shop.getShopName());// 評價符合條件的商店的餐點
+			List<FoodMapMeal> newMealList = new ArrayList<FoodMapMeal>();
+			for (FoodMapMeal meal : mealList) {
+				if (meal.getMealLevel() >= mealLevel) {
+					meal.setShopName(null);
+					newMealList.add(meal);
 				}
-				res.setCity(shop.getCity());
-				res.setShopName(shop.getShopName());
-				res.setShopLevel(shop.getShopLevel());
-				res.setMealList(newMealList);
-				resList.add(res);
-			
+			}
+			res.setCity(shop.getCity());
+			res.setShopName(shop.getShopName());
+			res.setShopLevel(shop.getShopLevel());
+			res.setMealList(newMealList);
+			resList.add(res);
+
 		}
 
 		listRes.setResList(resList);
@@ -237,6 +226,5 @@ public class FoodMapServiceImpl implements FoodMapService {
 //    }
 
 //==============================================================
-
 
 }

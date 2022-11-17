@@ -3,14 +3,18 @@ package com.example.foodmap_project.entity;
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class FoodMapMealId implements Serializable{
+public class FoodMapMealId implements Serializable {
 
 	private String shopName;
+
 	private String mealName;
-	
+
+//======================================
+
 	public FoodMapMealId() {
-		
+
 	}
+
 	public FoodMapMealId(String shopName, String mealName) {
 		this.shopName = shopName;
 		this.mealName = mealName;
@@ -31,5 +35,5 @@ public class FoodMapMealId implements Serializable{
 	public void setMealName(String meal_name) {
 		this.mealName = meal_name;
 	}
-	
+
 }

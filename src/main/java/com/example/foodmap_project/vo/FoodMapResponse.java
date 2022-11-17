@@ -12,39 +12,53 @@ public class FoodMapResponse {
 
 	@JsonProperty("shop_name")
 	private String shopName;
-	
+
 	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 	@JsonProperty("shop_level")
 	private double shopLevel;
-	
+
 	private FoodMapShop shop;
-	
+
 	private FoodMapMeal meal;
-	
+
 	@JsonProperty("city")
 	private String city;
-	
+
 	private String message;
-	
-	private List<FoodMapMeal> MealList;
+
+	private List<FoodMapMeal> mealList;
 
 //===========================================	
+	
 	public FoodMapResponse() {
-		
+
 	}
+
 	public FoodMapResponse(String message) {
 		this.message = message;
 	}
-	
-	public FoodMapResponse(FoodMapShop shop,String message) {
+
+	public FoodMapResponse(FoodMapShop shop, String message) {
 		this.shop = shop;
 		this.message = message;
 	}
-	public FoodMapResponse(FoodMapMeal meal,String message) {
+
+	public FoodMapResponse(FoodMapMeal meal, String message) {
 		this.meal = meal;
 		this.message = message;
 	}
-	
+
+	public FoodMapResponse(List<FoodMapMeal> mealList, String shopName, double shopLevel) {
+		this.mealList = mealList;
+		this.shopName = shopName;
+		this.shopLevel = shopLevel;
+	}
+
+	public FoodMapResponse(List<FoodMapMeal> mealList, FoodMapShop shop) {
+		this.mealList = mealList;
+		this.shop = shop;
+	}
+
 	public String getShopName() {
 		return shopName;
 	}
@@ -62,11 +76,11 @@ public class FoodMapResponse {
 	}
 
 	public List<FoodMapMeal> getMealList() {
-		return MealList;
+		return mealList;
 	}
 
 	public void setMealList(List<FoodMapMeal> mealList) {
-		MealList = mealList;
+		this.mealList = mealList;
 	}
 
 	public String getCity() {
@@ -92,12 +106,13 @@ public class FoodMapResponse {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+
 	public FoodMapMeal getMeal() {
 		return meal;
 	}
+
 	public void setMeal(FoodMapMeal meal) {
 		this.meal = meal;
 	}
 
-	
 }

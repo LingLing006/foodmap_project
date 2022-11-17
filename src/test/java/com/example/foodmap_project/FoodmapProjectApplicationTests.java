@@ -1,5 +1,6 @@
 package com.example.foodmap_project;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -20,47 +21,57 @@ class FoodmapProjectApplicationTests {
 
 	@Autowired
 	private FoodMapMealDao foodMapMealDao;
-	
+
 	@Autowired
 	private FoodMapShopDao foodMapShopDao;
-	
+
 	@Autowired
 	private FoodMapService foodMapService;
 
 	@Test
 	public void contextLoads() {
-		
-		
-		
+
+		List<String> shopNameList = new ArrayList<>();
+		shopNameList.add("KFC");
+		shopNameList.add("Lotteria");
+		shopNameList.add("McDonalds");
+		shopNameList.add("PizzaHut");
+		List<FoodMapMeal> mealList = foodMapMealDao.findByShopNameInAndMealLevelGreaterThanEqualOrderByMealLevelDesc(shopNameList,3);
+		for (FoodMapMeal meal : mealList) {
+			System.out.printf("shopname:%s mealname:%s mealLevel:%d\n", meal.getShopName(), meal.getMealName(),
+					meal.getMealLevel());
+		}
+
 //		FoodMapShop shop = foodMapService.updateShopName("AAA", "KFC");
 //		System.out.println(shop.getShopName()+"  "+shop.getShopLevel());
-		
+
 //		List<FoodMap_Shop> shopList = foodMapShopDao.findTop3ByCityOrderByShopLevelDesc("Keelung");
 //		for(FoodMap_Shop shop :shopList ) {
 //			System.out.printf("shopname:%s city:%s shopLevel:%.2f\n",shop.getShopName(),shop.getCity(),shop.getShopLevel());
 //		}
-		
+
 //		List<FoodMap_Shop> shopList = foodMapShopDao.findAllByOrderByShopLevelDesc();
 //		for(FoodMap_Shop shop :shopList ) {
 //			System.out.printf("shopname:%s city:%s shopLevel:%.2f\n",shop.getShopName(),shop.getCity(),shop.getShopLevel());
 //		}
-		
+
 //		List<FoodMap_Meal> mealList = foodMapMealDao.findByMealLevelGreaterThan(3);
 //		for(FoodMap_Meal meal :mealList ) {
 //			System.out.printf("shopname:%s mealname:%s mealLevel:%d\n",meal.getShopName(),meal.getMealName(),meal.getMealLevel());
 //		}
-		
-		
+
 	}
+
 	@Test
 	public void test() {
-		
-		List<FoodMapShop> shopList = foodMapShopDao.findByShopLevelGreaterThanOrderByShopLevelDesc(3.0);
-		for(FoodMapShop shop :shopList) {
-			System.out.printf("shopname:%s city:%s shopLevel:%.2f\n",shop.getShopName(),shop.getCity(),shop.getShopLevel());
+
+		List<FoodMapShop> shopList = foodMapShopDao.findByShopLevelGreaterThanEqualOrderByShopLevelDesc(3.0);
+		for (FoodMapShop shop : shopList) {
+			System.out.printf("shopname:%s city:%s shopLevel:%.2f\n", shop.getShopName(), shop.getCity(),
+					shop.getShopLevel());
 
 		}
-		
+
 //		FoodMapMealId id = new FoodMapMealId("Starbucks","coffee");
 //		FoodMapMeal meal = foodMapService.updateMealName(id, "pancake");
 //		System.out.println(meal.getShopName()+ "    "+ meal.getMealName()+"    "+meal.getMealLevel()+"    "+meal.getPrice());
@@ -68,7 +79,7 @@ class FoodmapProjectApplicationTests {
 //		FoodMapListResponse listRes = foodMapService.findShopByCity("Keelung", 3);
 //		System.out.println("City"+listRes.getCity());
 //		System.out.println(listRes.getResList());
-		
+
 //		List<FoodMap_Shop> list = foodMapShopDao.findAll(Sort.by(Sort.Direction.DESC, "shopLevel"));
 //		
 //		System.out.println(list);
@@ -77,7 +88,5 @@ class FoodmapProjectApplicationTests {
 //		System.out.println(shop.getShopName()+"   "+shop.getMealName()+"   "+shop.getMealLevel());
 //		}
 	}
-	
-	
 
 }

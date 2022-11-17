@@ -6,27 +6,29 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class FoodMapListResponse {
-	
+
 	private String city;
-	private List<FoodMapResponse> resList;
-	
+
+	private List<FoodMapResponse> searchResList;
+
 	private String message;
-	
-	
+
 //============================================	
+	
 	public FoodMapListResponse() {
-		
+
 	}
+
 	public FoodMapListResponse(String message) {
 		this.message = message;
 	}
 
-	public List<FoodMapResponse> getResList() {
-		return resList;
+	public List<FoodMapResponse> getSearchResList() {
+		return searchResList;
 	}
 
-	public void setResList(List<FoodMapResponse> resList) {
-		this.resList = resList;
+	public void setSearchResList(List<FoodMapResponse> searchResList) {
+		this.searchResList = searchResList;
 	}
 
 	public String getCity() {
@@ -44,6 +46,5 @@ public class FoodMapListResponse {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	
-	
+
 }

@@ -6,31 +6,30 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="foodmap_shop")
+@Table(name = "foodmap_shop")
 public class FoodMapShop {
 
 	@Id
-//	@GeneratedValue(strategy = GenerationType.AUTO)
-//  @GenericGenerator(name="system_uuid",strategy="uuid")
-	@Column(name="shop_name")
+	@Column(name = "shop_name")
 	private String shopName;
-	
-	@Column(name="city")
+
+	@Column(name = "city")
 	private String city;
-	
-	@Column(name="shop_level")
+
+	@Column(name = "shop_level")
 	private double shopLevel;
 
-//=========================================	
+//=========================================
+
 	public FoodMapShop() {
-		
+
 	}
-	
-	public FoodMapShop(String shopName,String city) {
+
+	public FoodMapShop(String shopName, String city) {
 		this.shopName = shopName;
 		this.city = city;
 	}
-	
+
 	public String getShopName() {
 		return shopName;
 	}
@@ -54,7 +53,5 @@ public class FoodMapShop {
 	public void setShopLevel(double shopLevel) {
 		this.shopLevel = shopLevel;
 	}
-	
-	
-	
+
 }

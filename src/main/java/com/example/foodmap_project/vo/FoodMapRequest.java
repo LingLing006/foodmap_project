@@ -9,10 +9,10 @@ public class FoodMapRequest {
 
 	@JsonProperty(value = "shop_name")
 	private String shopName;
-	
+
 	@JsonProperty(value = "new_shop_name")
 	private String newShopName;
-	
+
 	@JsonProperty(value = "new_meal_name")
 	private String newMealName;
 
@@ -24,14 +24,15 @@ public class FoodMapRequest {
 
 	@JsonProperty(value = "meal_level")
 	private int mealLevel;
-	
+
 	@JsonProperty(value = "shop_level")
 	private int shopLevel;
-	
+
 	@JsonProperty(value = "display_amount")
 	private int displayAmount;
 
 //====================================	
+
 	public FoodMapRequest() {
 
 	}
@@ -107,6 +108,5 @@ public class FoodMapRequest {
 	public void setShopLevel(int shopLevel) {
 		this.shopLevel = shopLevel;
 	}
-	
 
 }

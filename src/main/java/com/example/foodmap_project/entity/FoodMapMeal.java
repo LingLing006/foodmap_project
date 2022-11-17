@@ -20,29 +20,31 @@ public class FoodMapMeal {
 	@Id
 	@Column(name = "shop_name")
 	private String shopName;
-	
+
 	@Id
 	@Column(name = "meal_name")
 	private String mealName;
-	
+
 	@Column(name = "price")
 	private int price;
-	
+
 	@JsonProperty("meal_level")
 	@Column(name = "meal_level")
 	private int mealLevel;
 
-	public FoodMapMeal() {
-		
-	}
+//=====================================	
 	
-	public FoodMapMeal(String shop_name,String meal_name,int price,int mealLevel) {
+	public FoodMapMeal() {
+
+	}
+
+	public FoodMapMeal(String shop_name, String meal_name, int price, int mealLevel) {
 		this.shopName = shop_name;
 		this.mealName = meal_name;
 		this.mealLevel = mealLevel;
 		this.price = price;
 	}
-	
+
 	public String getShopName() {
 		return shopName;
 	}
@@ -74,6 +76,5 @@ public class FoodMapMeal {
 	public void setMealLevel(int meal_level) {
 		this.mealLevel = meal_level;
 	}
-	
-	
+
 }

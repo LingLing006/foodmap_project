@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import com.example.foodmap_project.vo.FoodMapListResponse;
 import com.example.foodmap_project.vo.FoodMapRequest;
 import com.example.foodmap_project.vo.FoodMapResponse;
 
+@CrossOrigin
 @RestController
 public class FoodMapController {
 
@@ -73,6 +75,7 @@ public class FoodMapController {
 		return res;
 	}
 
+// 修改餐點資訊	
 	@PostMapping(value = "/api/updateMealAllInfo")
 	public FoodMapResponse updateMealAllInfo(@RequestBody FoodMapRequest req) {
 
@@ -90,6 +93,7 @@ public class FoodMapController {
 		return res;
 	}
 
+// 尋找特定城市中的商店
 	@PostMapping(value = "/api/findShopByCity")
 	public FoodMapListResponse findShopByCity(@RequestBody FoodMapRequest req) {
 
@@ -106,9 +110,15 @@ public class FoodMapController {
 
 		listRes = foodMapService.findShopByCity(req.getCity(), req.getDisplayAmount());
 
+		// 若無此店家評價以上的餐廳，回傳訊息
+		if (listRes.getSearchResList().isEmpty()) {
+			return new FoodMapListResponse(FoodMapRtnCode.SHOPLEVEL_TOOHIGH_NO_SHOP.getMessage());
+		}
+
 		return listRes;
 	}
 
+// 尋找商店評價幾顆星以上的商店
 	@PostMapping(value = "/api/findShopByShopLevel")
 	public FoodMapListResponse findShopByShopLevel(@RequestBody FoodMapRequest req) {
 
@@ -121,10 +131,16 @@ public class FoodMapController {
 
 		listRes = foodMapService.findShopByShopLevel(req.getShopLevel());
 
+		// 若無此店家評價以上的餐廳，回傳訊息
+		if (listRes.getSearchResList().isEmpty()) {
+			return new FoodMapListResponse(FoodMapRtnCode.SHOPLEVEL_TOOHIGH_NO_SHOP.getMessage());
+		}
+
 		return listRes;
 
 	}
 
+// 尋找商店評價幾顆星以上的商店，同時顯示餐點評價幾顆星以上的餐點
 	@PostMapping(value = "/api/findShopByShopLevelAndMealLevel")
 	public FoodMapListResponse findShopByShopLevelAndMealLevel(@RequestBody FoodMapRequest req) {
 
@@ -135,11 +151,17 @@ public class FoodMapController {
 		}
 
 		listRes = foodMapService.findShopByShopLevelAndMealLevel(req.getShopLevel(), req.getMealLevel());
+
+		// 若無此店家評價以上的餐廳，回傳訊息
+		if (listRes.getSearchResList().isEmpty()) {
+			return new FoodMapListResponse(FoodMapRtnCode.SHOPLEVEL_TOOHIGH_NO_SHOP.getMessage());
+		}
 		
 		return listRes;
 	}
 
 //================================================
+
 	private FoodMapResponse checkParamForShopCreate(FoodMapRequest req) {
 
 		if (Objects.isNull(req)) {
@@ -157,7 +179,7 @@ public class FoodMapController {
 		if (Objects.isNull(req)) {
 			new FoodMapResponse(FoodMapRtnCode.REQ_REQUIRED.getMessage());
 		}
-		
+
 		if (!StringUtils.hasText(req.getShopName())) {
 			return new FoodMapResponse(FoodMapRtnCode.SHOPNAME_REQUIRED.getMessage());
 		}
@@ -170,11 +192,10 @@ public class FoodMapController {
 
 	private FoodMapResponse checkParamMealForCreate(FoodMapRequest req) {
 
-
 		if (Objects.isNull(req)) {
 			new FoodMapResponse(FoodMapRtnCode.REQ_REQUIRED.getMessage());
 		}
-		
+
 		if (req.getMealLevel() <= 0 || req.getMealLevel() > 5 || req.getPrice() <= 0) {
 			return new FoodMapResponse(FoodMapRtnCode.LEVEL_PRICE_FAILURE.getMessage());
 		}
@@ -188,43 +209,43 @@ public class FoodMapController {
 
 	private FoodMapResponse checkParamMealForUpdate(FoodMapRequest req) {
 
-
 		if (Objects.isNull(req)) {
 			new FoodMapResponse(FoodMapRtnCode.REQ_REQUIRED.getMessage());
 		}
-		
+
 		if (!StringUtils.hasText(req.getNewMealName()) && req.getPrice() == 0 && req.getMealLevel() == 0) {
-			return new FoodMapResponse("Price = 0 , MealLevel = 0 , NewMealName為空，資訊皆不修改");
+			return new FoodMapResponse(FoodMapRtnCode.UPDATE_NOT_MODIFY.getMessage());
 		}
 
 		if (!StringUtils.hasText(req.getShopName()) || !StringUtils.hasText(req.getMealName())) {
 			return new FoodMapResponse(FoodMapRtnCode.MEALNAME_REQUIRED.getMessage());
 		}
-		
+
 		if (req.getPrice() < 0) {
 			return new FoodMapResponse(FoodMapRtnCode.PRICE_FAIL.getMessage());
 		}
+		
 		if (req.getMealLevel() < 0 || req.getMealLevel() > 5) {
 			return new FoodMapResponse(FoodMapRtnCode.LEVEL_FAILURE.getMessage());
 		}
-		
+
 		return null;
 	}
 
 	private FoodMapListResponse checkParamForFindShopByCity(FoodMapRequest req) {
-		
+
 		if (Objects.isNull(req)) {
 			new FoodMapResponse(FoodMapRtnCode.REQ_REQUIRED.getMessage());
 		}
-		
+
 		if (req.getDisplayAmount() < 0) {
 			return new FoodMapListResponse(FoodMapRtnCode.DISPLAYAMOUNT_NEGATIVE.getMessage());
 		}
-		
+
 		if (!StringUtils.hasText(req.getCity())) {
 			return new FoodMapListResponse(FoodMapRtnCode.CITY_REQUIRED.getMessage());
 		}
-		
+
 		return null;
 	}
 
@@ -233,7 +254,7 @@ public class FoodMapController {
 		if (Objects.isNull(req)) {
 			new FoodMapResponse(FoodMapRtnCode.REQ_REQUIRED.getMessage());
 		}
-		
+
 		if (req.getShopLevel() < 0 || req.getShopLevel() > 5) {
 			return new FoodMapListResponse(FoodMapRtnCode.SHOPLEVEL_FAIL.getMessage());
 		}

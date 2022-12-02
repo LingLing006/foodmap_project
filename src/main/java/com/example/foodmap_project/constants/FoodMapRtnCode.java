@@ -3,8 +3,11 @@ package com.example.foodmap_project.constants;
 public enum FoodMapRtnCode {
 
 	SUCCESSFUL("200", "SUCCESSFUL"), 
-	UPDATE_SUCCESSFUL("200", "SUCCESSFUL / price & meal_level 若=0 等同不修改"),
+	UPDATE_SUCCESSFUL("200", "SUCCESSFUL  (if price & meal_level = 0 do not modify)"),
+	SHOPLEVEL_TOOHIGH_NO_SHOP("200","There are no shops above this shoplevel"),
 
+	UPDATE_NOT_MODIFY("400", "Price = 0 , MealLevel = 0 , NewMealName = null do not modify)"),
+	
 	SHOPNAME_CITY_REQUIRED("400", "Shop_name & City can not be null or empty"),
 	NEWSHOPNAME_CITY_REQUIRED("400", "New_Shop_name & City can not be null or empty"),
 	REQ_REQUIRED("400", "Request can not be null or empty"), 
@@ -16,7 +19,7 @@ public enum FoodMapRtnCode {
 	SHOPNAME_EXISTED("403", "Shop_name is existed"),
 	MEALNAME_EXISTED("403", "Shop_name & Meal_name is existed"),
 
-	SHOPNAME_INEXISTED("403", "Shop_name is not existed(商店的資料庫中，不存在此商店名稱)"),
+	SHOPNAME_INEXISTED("403", "Shop_name is not existed"),
 	MEALNAME_INEXISTED("403", "Shop_name & Meal_name is not existed"),
 
 	DISPLAYAMOUNT_NEGATIVE("400", "DisplayAmount cannot be negative"),

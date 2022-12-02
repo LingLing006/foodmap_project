@@ -10,6 +10,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class FoodMapResponse {
 
+	@JsonProperty("city")
+	private String city;
+	
 	@JsonProperty("shop_name")
 	private String shopName;
 
@@ -21,12 +24,9 @@ public class FoodMapResponse {
 
 	private FoodMapMeal meal;
 
-	@JsonProperty("city")
-	private String city;
-
-	private String message;
-
 	private List<FoodMapMeal> mealList;
+	
+	private String message;
 
 //===========================================	
 	
@@ -54,6 +54,12 @@ public class FoodMapResponse {
 		this.shopLevel = shopLevel;
 	}
 
+	public FoodMapResponse(String shopName,double shopLevel, List<FoodMapMeal> mealList) {
+		this.mealList = mealList;
+		this.shopName = shopName;
+		this.shopLevel = shopLevel;
+	}
+	
 	public FoodMapResponse(List<FoodMapMeal> mealList, FoodMapShop shop) {
 		this.mealList = mealList;
 		this.shop = shop;

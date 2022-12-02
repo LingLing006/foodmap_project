@@ -70,7 +70,7 @@ public class FoodMapServiceImpl implements FoodMapService {
 				mealDao.save(meal);
 			}
 		}
-		
+
 		shopDao.save(shop);
 		return new FoodMapResponse(shop, FoodMapRtnCode.SUCCESSFUL.getMessage());
 	}
@@ -134,18 +134,18 @@ public class FoodMapServiceImpl implements FoodMapService {
 
 		// 如果有修改餐點評價，進行設定後，店家評價也需要進行更改
 		if (mealLevel != 0) {
-			
+
 			// 計算此商店的所有餐點評價的加總
 			double total = 0;
-			
+
 			// 設定新的餐點評價
 			meal.setMealLevel(mealLevel);
-			
+
 			List<FoodMapMeal> mealList = mealDao.findByShopNameAllIgnoreCaseOrderByMealLevelDesc(mealId.getShopName());
 			for (FoodMapMeal mealitem : mealList) {
 				total += mealitem.getMealLevel();
 			}
-			
+
 			// 計算此商店的所有餐點評價的平均，並將此平均設定為店家評價
 			FoodMapShop shop = shopDao.getById(mealId.getShopName());
 			shop.setShopLevel(Math.round(((total + mealLevel) / (mealList.size() + 1)) * 10.0) / 10.0);
@@ -195,7 +195,7 @@ public class FoodMapServiceImpl implements FoodMapService {
 		for (FoodMapShop shop : shopList) {
 			// 創建一個List用來存放此店家的所有餐點
 			List<FoodMapMeal> mealList = new ArrayList<>();
-			
+
 			// 挑選出當前的店家的所有餐點，並將餐點存入mealList
 			for (FoodMapMeal meal : mealListFindByShopNameIn) {
 				if (shop.getShopName().equalsIgnoreCase(meal.getShopName())) {
@@ -204,7 +204,7 @@ public class FoodMapServiceImpl implements FoodMapService {
 				}
 			}
 			// 建立用於存放一個店家資訊及餐點資訊的物件，並將此物件一一加入可以回傳多筆店家資訊的List
-			FoodMapResponse res = new FoodMapResponse( shop.getShopName(), shop.getShopLevel(),mealList);
+			FoodMapResponse res = new FoodMapResponse(shop.getShopName(), shop.getShopLevel(), mealList);
 			resList.add(res);
 		}
 
@@ -223,7 +223,7 @@ public class FoodMapServiceImpl implements FoodMapService {
 		List<FoodMapResponse> resList = new ArrayList<>();
 		// 搜尋資料庫中，所有商店評價為幾顆星(含)以上的店家
 		List<FoodMapShop> shopList = shopDao.findByShopLevelGreaterThanEqualOrderByShopLevelDesc((double) shopLevel);
-		
+
 		// 建立一個用來存放shopList中，所有店家名稱的List
 		List<String> shopNameList = new ArrayList<>();
 		// 並取得shopList中所有的店家名稱後，存放進shopNameList
@@ -233,22 +233,9 @@ public class FoodMapServiceImpl implements FoodMapService {
 
 		// 找出所有在shopNameList中，各間店家的所有餐點
 		List<FoodMapMeal> mealListFindByShopNameIn = mealDao.findByShopNameIn(shopNameList);
-
-		// 一一找出店家以及將此店家的所有餐點，存放進一個mealList，並將其加入回傳的類別當中
-		for (FoodMapShop shop : shopList) {
-			// 創建一個List用來存放此店家的所有餐點
-			List<FoodMapMeal> mealList = new ArrayList<>();
-			// 挑選出當前外層迴圈的店家的所有餐點，並將餐點存入mealList
-			for (FoodMapMeal meal : mealListFindByShopNameIn) {
-				if (shop.getShopName().equalsIgnoreCase(meal.getShopName())) {
-					meal.setShopName(null);
-					mealList.add(meal);
-				}
-			}
-			// 建立用於存放一個店家資訊及餐點資訊的物件，並將此物件一一加入可以回傳多筆店家資訊的List
-			FoodMapResponse res = new FoodMapResponse(mealList, shop);
-			resList.add(res);
-		}
+		
+		// 將shopList中所有商店的餐點資訊，加到resList中
+		resList = getAllShopsMealList(shopList , mealListFindByShopNameIn);
 
 		resListObject.setSearchResList(resList);
 		resListObject.setMessage(FoodMapRtnCode.SUCCESSFUL.getMessage());
@@ -275,15 +262,28 @@ public class FoodMapServiceImpl implements FoodMapService {
 		// 找出所有在shopNameList中，各間店家餐點評價己興(含)以上的餐點
 		List<FoodMapMeal> mealListFindByShopNameIn = mealDao
 				.findByShopNameInAndMealLevelGreaterThanEqualOrderByMealLevelDesc(shopNameList, mealLevel);
+	
+		// 將shopList中所有商店的餐點資訊，加到resList中
+		resList = getAllShopsMealList(shopList , mealListFindByShopNameIn);
+		
+		resListObject.setSearchResList(resList);
+		resListObject.setMessage(FoodMapRtnCode.SUCCESSFUL.getMessage());
+		return resListObject;
+	}
 
+	private List<FoodMapResponse> getAllShopsMealList(List<FoodMapShop> shopList, List<FoodMapMeal> allMealList) {
+		
+		// 建立存放多筆店家資訊及餐點資訊的List
+		List<FoodMapResponse> resList = new ArrayList<>();
+		
 		// 一一找出店家以及將此店家的所有餐點，存放進一個mealList，並將其加入回傳的類別當中
 		for (FoodMapShop shop : shopList) {
-			
+
 			// 創建一個List用來存放此店家餐點評價己興(含)以上的餐點
 			List<FoodMapMeal> mealList = new ArrayList<>();
-			
+
 			// 挑選出當前店家的所有餐點，並將餐點存入mealList
-			for (FoodMapMeal meal : mealListFindByShopNameIn) {
+			for (FoodMapMeal meal : allMealList) {
 				if (shop.getShopName().equalsIgnoreCase(meal.getShopName())) {
 					meal.setShopName(null);
 					mealList.add(meal);
@@ -293,10 +293,7 @@ public class FoodMapServiceImpl implements FoodMapService {
 			FoodMapResponse res = new FoodMapResponse(mealList, shop);
 			resList.add(res);
 		}
-
-		resListObject.setSearchResList(resList);
-		resListObject.setMessage(FoodMapRtnCode.SUCCESSFUL.getMessage());
-		return resListObject;
+		
+		return resList;
 	}
-
 }
